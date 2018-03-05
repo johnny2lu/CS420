@@ -2,12 +2,16 @@ import java.util.*;
 
 public class ABPruning {
 
-    // time to abort in milliseconds
-    private final long MAX_TIME = 5000;
+    private long MAX_TIME;
     private final Integer POSITIVE_INFINITY = Integer.MAX_VALUE;
     private final Integer NEGATIVE_INFINITY = Integer.MIN_VALUE;
     private long startTime;
     private PriorityQueue<Move> utilityMoves;
+
+    public ABPruning(int timeSecondsAllowed) {
+        // time to abort in milliseconds
+        MAX_TIME = (long) timeSecondsAllowed * 1000;
+    }
 
     public Move ABSearch(Board board) {
         startTime = System.currentTimeMillis();
@@ -82,6 +86,7 @@ public class ABPruning {
 
     // check if game has a winner
     public boolean terminalState(Board board) {
+        // TODO
         return true;
     }
 
