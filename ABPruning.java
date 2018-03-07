@@ -5,7 +5,7 @@ public class ABPruning {
     private long MAX_TIME;
     private final Integer POSITIVE_INFINITY = Integer.MAX_VALUE;
     private final Integer NEGATIVE_INFINITY = Integer.MIN_VALUE;
-    private final int DEPTH = 5;
+    private final int MAX_DEPTH = 5;
     private long startTime;
     private PriorityQueue<Move> utilityMoves;
 
@@ -23,19 +23,20 @@ public class ABPruning {
                 return o2.getUtility() - o1.getUtility();
             }
         });
-        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY, DEPTH);
+        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY, MAX_DEPTH);
         /*
         if (v == NEGATIVE_INFINITY || v == POSITIVE_INFINITY) {
             return utilityMoves.poll();
         }
         else {
         */
-        System.out.println(v);
             // get the move with utility v by iterating through priority queue
             Iterator iterator = utilityMoves.iterator();
             while (iterator.hasNext()) {
                 Move m = (Move) iterator.next();
+                //System.out.println(m.getUtility());
                 if (m.getUtility() == v) {
+                    System.out.println(v);
                     return m;
                 }
             }
@@ -45,6 +46,7 @@ public class ABPruning {
     }
 
     public int maxValue(Board board, int alpha, int beta, int depth) {
+        //System.out.println(depth);
         if (!terminalState(board) && !cutOffTime()) {
             int v = NEGATIVE_INFINITY;
             // loop through each possible move on board
@@ -52,8 +54,8 @@ public class ABPruning {
                 // create separate board to calculate utility
                 Board testBoard = board.deepCopy(board);
                 testBoard.move(action);
-                System.out.println(testBoard);
-                v = max(v, minValue(testBoard, alpha, beta, depth));
+                //System.out.println(testBoard);
+                v = max(v, minValue(testBoard, alpha, beta, depth + 1));
                 action.setUtility(v);
                 utilityMoves.add(action);
                 if (v >= beta) {
@@ -64,7 +66,7 @@ public class ABPruning {
             return v;
         }
         // reached time limit
-        return NEGATIVE_INFINITY;
+        return alpha;
     }
 
     public int minValue(Board board, int alpha, int beta, int depth) {
@@ -75,8 +77,8 @@ public class ABPruning {
                 Board testBoard = board.deepCopy(board);
                 testBoard.setPlayerTurn(GamePlayer.OPPONENT);
                 testBoard.move(action);
-                System.out.println(testBoard);
-                v = min(v, maxValue(testBoard, alpha, beta, depth));
+                //System.out.println(testBoard);
+                v = min(v, maxValue(testBoard, alpha, beta, depth + 1));
                 action.setUtility(v);
                 utilityMoves.add(action);
                 if (v <= alpha) {
@@ -87,7 +89,7 @@ public class ABPruning {
             return v;
         }
         // reached time limit
-        return POSITIVE_INFINITY;
+        return beta;
     }
 
     // check if game has a winner

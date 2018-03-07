@@ -125,7 +125,7 @@ public class Board {
 
     public List<Move> getPossibleMoves() {
         moves = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int i = 0; i < BOARD_SIZE ; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (tiles[i][j] == GamePiece._) {
                     Move possibleMove = new Move(i, j);
