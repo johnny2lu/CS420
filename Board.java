@@ -129,6 +129,7 @@ public class Board {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (tiles[i][j] == GamePiece._) {
                     Move possibleMove = new Move(i, j);
+                    //System.out.println(evaluateUtility(possibleMove));
                     possibleMove.setUtility(evaluateUtility(possibleMove));
                     moves.add(possibleMove);
                 }
@@ -195,12 +196,12 @@ public class Board {
             }
         }
         if (row - 1 < BOARD_SIZE) {
-            if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X) {
+            if (tiles[row][col] == GamePiece.X && tiles[row - 1][col] == GamePiece.X) {
                 playerUtility += 10;
             }
         }
 
-        // check opponent moves
+        // check opponent moves horizontally
         if (row + 3 < BOARD_SIZE) {
             if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O &&
                     tiles[row + 2][col] == GamePiece.O && tiles[row + 3][col] == GamePiece.O) {
@@ -233,11 +234,87 @@ public class Board {
             }
         }
         if (row - 1 < BOARD_SIZE) {
-            if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O) {
+            if (tiles[row][col] == GamePiece.O && tiles[row - 1][col] == GamePiece.O) {
                 opponentUtility -= 10;
             }
         }
 
+        // check player moves
+        // check four in a row vertically
+        if (col + 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col + 1] == GamePiece.X &&
+                    tiles[row][col + 2] == GamePiece.X && tiles[row][col + 3] == GamePiece.X) {
+                playerUtility += 10000;
+            }
+        }
+        if (col - 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col - 1] == GamePiece.X &&
+                    tiles[row][col - 2] == GamePiece.X && tiles[row][col - 3] == GamePiece.X) {
+                playerUtility += 10000;
+            }
+        }
+        // check three in a row vertically
+        if (col + 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col + 1] == GamePiece.X &&
+                    tiles[row][col + 2] == GamePiece.X) {
+                playerUtility += 75;
+            }
+        }
+        if (col - 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col - 1] == GamePiece.X &&
+                    tiles[row][col - 2] == GamePiece.X) {
+                playerUtility += 75;
+            }
+        }
+        // check two in a row vertically
+        if (col + 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col + 1] == GamePiece.X) {
+                playerUtility += 10;
+            }
+        }
+        if (col - 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row][col - 1] == GamePiece.X) {
+                playerUtility += 10;
+            }
+        }
+
+        // check opponent moves vertically
+        if (col + 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col + 1] == GamePiece.O &&
+                    tiles[row][col + 2] == GamePiece.O && tiles[row][col + 3] == GamePiece.O) {
+                opponentUtility += 10000;
+            }
+        }
+        if (col - 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col - 1] == GamePiece.O &&
+                    tiles[row][col - 2] == GamePiece.O && tiles[row][col - 3] == GamePiece.O) {
+                opponentUtility += 10000;
+            }
+        }
+        // check three in a row vertically
+        if (col + 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col + 1] == GamePiece.O &&
+                    tiles[row][col + 2] == GamePiece.O) {
+                opponentUtility += 75;
+            }
+        }
+        if (col - 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col - 1] == GamePiece.O &&
+                    tiles[row][col - 2] == GamePiece.O) {
+                opponentUtility += 75;
+            }
+        }
+        // check two in a row vertically
+        if (col + 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col + 1] == GamePiece.O) {
+                opponentUtility += 10;
+            }
+        }
+        if (col - 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row][col - 1] == GamePiece.O) {
+                opponentUtility += 10;
+            }
+        }
         return playerUtility - opponentUtility;
     }
 

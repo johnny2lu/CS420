@@ -23,7 +23,7 @@ public class ABPruning {
                 return o2.getUtility() - o1.getUtility();
             }
         });
-        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY, MAX_DEPTH);
+        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY, 0);
         /*
         if (v == NEGATIVE_INFINITY || v == POSITIVE_INFINITY) {
             return utilityMoves.poll();
@@ -47,18 +47,22 @@ public class ABPruning {
 
     public int maxValue(Board board, int alpha, int beta, int depth) {
         //System.out.println(depth);
-        if (!terminalState(board) && !cutOffTime()) {
+        if (!terminalState(board) && !cutOffTime() && depth <= MAX_DEPTH) {
+            System.out.println("MAX LOOP");
             int v = NEGATIVE_INFINITY;
             // loop through each possible move on board
             for (Move action : board.getPossibleMoves()) {
+                //System.out.println(action.getUtility());
                 // create separate board to calculate utility
                 Board testBoard = board.deepCopy(board);
                 testBoard.move(action);
-                //System.out.println(testBoard);
+                System.out.println(testBoard);
                 v = max(v, minValue(testBoard, alpha, beta, depth + 1));
+                System.out.println("V: " + v);
                 action.setUtility(v);
                 utilityMoves.add(action);
                 if (v >= beta) {
+                    System.out.println("GREATER THAN BETA");
                     return v;
                 }
                 alpha = max(alpha, v);
@@ -70,14 +74,15 @@ public class ABPruning {
     }
 
     public int minValue(Board board, int alpha, int beta, int depth) {
-        if (!terminalState(board) && !cutOffTime()) {
+        if (!terminalState(board) && !cutOffTime() && depth <= MAX_DEPTH) {
+            System.out.println("MIN LOOP");
             int v = POSITIVE_INFINITY;
             // loop through each possible move on board
             for (Move action : board.getPossibleMoves()) {
                 Board testBoard = board.deepCopy(board);
                 testBoard.setPlayerTurn(GamePlayer.OPPONENT);
                 testBoard.move(action);
-                //System.out.println(testBoard);
+                System.out.println(testBoard);
                 v = min(v, maxValue(testBoard, alpha, beta, depth + 1));
                 action.setUtility(v);
                 utilityMoves.add(action);
