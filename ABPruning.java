@@ -52,6 +52,7 @@ public class ABPruning {
                 // create separate board to calculate utility
                 Board testBoard = board.deepCopy(board);
                 testBoard.move(action);
+                System.out.println(testBoard);
                 v = max(v, minValue(testBoard, alpha, beta, depth));
                 action.setUtility(v);
                 utilityMoves.add(action);
@@ -72,7 +73,9 @@ public class ABPruning {
             // loop through each possible move on board
             for (Move action : board.getPossibleMoves()) {
                 Board testBoard = board.deepCopy(board);
+                testBoard.setPlayerTurn(GamePlayer.OPPONENT);
                 testBoard.move(action);
+                System.out.println(testBoard);
                 v = min(v, maxValue(testBoard, alpha, beta, depth));
                 action.setUtility(v);
                 utilityMoves.add(action);

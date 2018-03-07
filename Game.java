@@ -38,24 +38,32 @@ public class Game {
                 System.out.print("Choose opponent's next move: ");
                 String opponentMove = kb.nextLine();
                 Move nextMove = stringToMove(opponentMove);
-                board.move(nextMove);
-                board.setPlayerTurn(GamePlayer.PLAYER);
+                if (board.move(nextMove)) {
+                    board.setPlayerTurn(GamePlayer.PLAYER);
+                }
+                else {
+                    break;
+                }
             }
             else if (board.getPlayerTurn() == GamePlayer.PLAYER) {
-                // make first move
                 Move nextMove = abPruning.ABSearch(board);
-                board.move(nextMove);
-                System.out.print("Player's move is: " + moveToString(nextMove));
-                board.setPlayerTurn(GamePlayer.OPPONENT);
+                if (board.move(nextMove)) {
+                    System.out.print("Player's move is: " + moveToString(nextMove));
+                    board.setPlayerTurn(GamePlayer.OPPONENT);
+                }
+                else {
+                    break;
+                }
             }
             System.out.println();
             System.out.println(board);
             // check for winner
             if (board.getGameStatus()) {
-                System.out.println("Game over");
                 break;
             }
         }
+        System.out.println(board);
+        System.out.println("Game over");
     }
 
     // translate string <char><int> move to board move with x and y coordinates

@@ -42,10 +42,6 @@ public class Board {
             System.out.println("Invalid move");
             return false;
         }
-        if (isGameOver(action)) {
-            gameOver = true;
-            return false;
-        }
 
         // whose turn is it anyways?
         if (playerTurn == GamePlayer.OPPONENT) {
@@ -55,6 +51,11 @@ public class Board {
             tiles[action.getRow()][action.getCol()] = GamePiece.X;
         }
         turnNumber++;
+
+        if (isGameOver(action)) {
+            gameOver = true;
+            return false;
+        }
         return true;
     }
 
@@ -75,17 +76,15 @@ public class Board {
         // check for winner or if game is a draw
         int x = action.getRow();
         int y = action.getCol();
+
         GamePiece currentPlayer = null;
-        if (tiles[x][y] == GamePiece.X) {
+        if (playerTurn == GamePlayer.PLAYER) {
             currentPlayer = GamePiece.X;
         }
-        else if (tiles[x][y] == GamePiece.O) {
+        else if (playerTurn == GamePlayer.OPPONENT) {
             currentPlayer = GamePiece.O;
         }
-        else {
-            // empty move
-            return false;
-        }
+
         // no moves left
         if (!checkDraw()) {
             // check horizontal, vertical for winning game
@@ -192,12 +191,12 @@ public class Board {
         // check two in a row horizontally
         if (row + 1 < BOARD_SIZE) {
             if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X) {
-                playerUtility += 25;
+                playerUtility += 10;
             }
         }
         if (row - 1 < BOARD_SIZE) {
             if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X) {
-                playerUtility += 25;
+                playerUtility += 10;
             }
         }
 
@@ -230,12 +229,12 @@ public class Board {
         // check two in a row horizontally
         if (row + 1 < BOARD_SIZE) {
             if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O) {
-                opponentUtility -= 25;
+                opponentUtility -= 10;
             }
         }
         if (row - 1 < BOARD_SIZE) {
             if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O) {
-                opponentUtility -= 25;
+                opponentUtility -= 10;
             }
         }
 
