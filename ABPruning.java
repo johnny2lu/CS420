@@ -5,6 +5,7 @@ public class ABPruning {
     private long MAX_TIME;
     private final Integer POSITIVE_INFINITY = Integer.MAX_VALUE;
     private final Integer NEGATIVE_INFINITY = Integer.MIN_VALUE;
+    private final int DEPTH = 5;
     private long startTime;
     private PriorityQueue<Move> utilityMoves;
 
@@ -22,7 +23,7 @@ public class ABPruning {
                 return o2.getUtility() - o1.getUtility();
             }
         });
-        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY);
+        int v = maxValue(board, NEGATIVE_INFINITY, POSITIVE_INFINITY, DEPTH);
         /*
         if (v == NEGATIVE_INFINITY || v == POSITIVE_INFINITY) {
             return utilityMoves.poll();
@@ -43,16 +44,15 @@ public class ABPruning {
         //}
     }
 
-    public int maxValue(Board board, int alpha, int beta) {
+    public int maxValue(Board board, int alpha, int beta, int depth) {
         if (!terminalState(board) && !cutOffTime()) {
             int v = NEGATIVE_INFINITY;
             // loop through each possible move on board
-            System.out.println(board.getPossibleMoves().size());
             for (Move action : board.getPossibleMoves()) {
                 // create separate board to calculate utility
-                Board testBoard = new Board(board);
+                Board testBoard = board.deepCopy(board);
                 testBoard.move(action);
-                v = max(v, minValue(testBoard, alpha, beta));
+                v = max(v, minValue(testBoard, alpha, beta, depth));
                 action.setUtility(v);
                 utilityMoves.add(action);
                 if (v >= beta) {
@@ -66,14 +66,14 @@ public class ABPruning {
         return NEGATIVE_INFINITY;
     }
 
-    public int minValue(Board board, int alpha, int beta) {
+    public int minValue(Board board, int alpha, int beta, int depth) {
         if (!terminalState(board) && !cutOffTime()) {
             int v = POSITIVE_INFINITY;
             // loop through each possible move on board
             for (Move action : board.getPossibleMoves()) {
-                Board testBoard = new Board(board);
+                Board testBoard = board.deepCopy(board);
                 testBoard.move(action);
-                v = min(v, minValue(testBoard, alpha, beta));
+                v = min(v, maxValue(testBoard, alpha, beta, depth));
                 action.setUtility(v);
                 utilityMoves.add(action);
                 if (v <= alpha) {

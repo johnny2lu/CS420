@@ -51,7 +51,7 @@ public class Game {
             System.out.println();
             System.out.println(board);
             // check for winner
-            if (!board.getGameStatus()) {
+            if (board.getGameStatus()) {
                 System.out.println("Game over");
                 break;
             }

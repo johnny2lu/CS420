@@ -19,8 +19,12 @@ public class Board {
         initializeBoard();
     }
 
-    public Board(Board board) {
-        this.tiles = board.tiles;
+    public Board deepCopy(Board board) {
+        Board copy = new Board();
+        for (int i = 0; i < tiles.length; i++) {
+            copy.getGamePieces()[i] = Arrays.copyOf(board.getGamePieces()[i], board.getGamePieces()[i].length);
+        }
+        return copy;
     }
 
     // initialize board with negative values
@@ -47,7 +51,7 @@ public class Board {
         if (playerTurn == GamePlayer.OPPONENT) {
             tiles[action.getRow()][action.getCol()] = GamePiece.O;
         }
-        else if (playerTurn == GamePlayer.PLAYER) {
+        else {
             tiles[action.getRow()][action.getCol()] = GamePiece.X;
         }
         turnNumber++;
@@ -144,6 +148,10 @@ public class Board {
 
     public boolean getGameStatus() {
         return gameOver;
+    }
+
+    public GamePiece[][] getGamePieces() {
+        return tiles;
     }
 
     public int evaluateUtility(Move move) {
