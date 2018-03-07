@@ -29,6 +29,7 @@ public class ABPruning {
         }
         else {
         */
+        System.out.println(v);
             // get the move with utility v by iterating through priority queue
             Iterator iterator = utilityMoves.iterator();
             while (iterator.hasNext()) {
@@ -43,10 +44,12 @@ public class ABPruning {
     }
 
     public int maxValue(Board board, int alpha, int beta) {
-        if (terminalState(board) && !cutOffTime()) {
+        if (!terminalState(board) && !cutOffTime()) {
             int v = NEGATIVE_INFINITY;
             // loop through each possible move on board
+            System.out.println(board.getPossibleMoves().size());
             for (Move action : board.getPossibleMoves()) {
+                // create separate board to calculate utility
                 Board testBoard = new Board(board);
                 testBoard.move(action);
                 v = max(v, minValue(testBoard, alpha, beta));
@@ -64,7 +67,7 @@ public class ABPruning {
     }
 
     public int minValue(Board board, int alpha, int beta) {
-        if (terminalState(board) && !cutOffTime()) {
+        if (!terminalState(board) && !cutOffTime()) {
             int v = POSITIVE_INFINITY;
             // loop through each possible move on board
             for (Move action : board.getPossibleMoves()) {
@@ -86,8 +89,7 @@ public class ABPruning {
 
     // check if game has a winner
     public boolean terminalState(Board board) {
-        // TODO
-        return true;
+        return board.getGameStatus();
     }
 
     // check if max time reached

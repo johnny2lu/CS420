@@ -3,16 +3,19 @@ import java.util.*;
 public class Board {
 
     private final int BOARD_SIZE = 8;
+    private final int MOVES_TO_WIN = 4;
     private GamePiece[][] tiles;
     // maps moves to utility cost values
-    private Set<Move> moves;
+    private List<Move> moves;
     private GamePlayer playerTurn;
+    private boolean gameOver;
+    private int turnNumber;
 
-    public Board(GamePlayer playerTurn) {
+    public Board() {
         // initialize empty board
         tiles = new GamePiece[BOARD_SIZE][BOARD_SIZE];
-        moves = new HashSet<>();
-        this.playerTurn = playerTurn;
+        gameOver = false;
+        turnNumber = 0;
         initializeBoard();
     }
 
@@ -36,7 +39,7 @@ public class Board {
             return false;
         }
         if (isGameOver(action)) {
-            System.out.println("Game over");
+            gameOver = true;
             return false;
         }
 
@@ -44,18 +47,12 @@ public class Board {
         if (playerTurn == GamePlayer.OPPONENT) {
             tiles[action.getRow()][action.getCol()] = GamePiece.O;
         }
-        else {
+        else if (playerTurn == GamePlayer.PLAYER) {
             tiles[action.getRow()][action.getCol()] = GamePiece.X;
         }
+        turnNumber++;
         return true;
     }
-
-    /*
-    // test different move permutations to find best path
-    public Board testMove(Move action) {
-        this.move(action);
-    }
-    */
 
     public boolean checkValidMove(Move action) {
         int x = action.getRow();
@@ -71,23 +68,170 @@ public class Board {
     }
 
     public boolean isGameOver(Move action) {
-        // TODO
         // check for winner or if game is a draw
         int x = action.getRow();
         int y = action.getCol();
+        GamePiece currentPlayer = null;
+        if (tiles[x][y] == GamePiece.X) {
+            currentPlayer = GamePiece.X;
+        }
+        else if (tiles[x][y] == GamePiece.O) {
+            currentPlayer = GamePiece.O;
+        }
+        else {
+            // empty move
+            return false;
+        }
+        // no moves left
+        if (!checkDraw()) {
+            // check horizontal, vertical for winning game
+            int vertical = 0;
+            int horizontal = 0;
+            for (int i = 0; i < BOARD_SIZE; i++) {
+                // vertical check
+                if (tiles[x][i] == currentPlayer) {
+                    vertical++;
+                }
+                else {
+                    vertical = 0;
+                }
 
+                // horizontal check
+                if (tiles[i][y] == currentPlayer) {
+                    horizontal++;
+                }
+                else {
+                    horizontal = 0;
+                }
+
+                if (horizontal >= MOVES_TO_WIN || vertical >= MOVES_TO_WIN) {
+                    // we have a winner
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    public Set<Move> getPossibleMoves() {
+    public boolean checkDraw() {
+        if (turnNumber == (BOARD_SIZE * BOARD_SIZE)) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<Move> getPossibleMoves() {
+        moves = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if (tiles[i][j] != GamePiece._) {
-                    moves.add(new Move(i, j));
+                if (tiles[i][j] == GamePiece._) {
+                    Move possibleMove = new Move(i, j);
+                    possibleMove.setUtility(evaluateUtility(possibleMove));
+                    moves.add(possibleMove);
                 }
             }
         }
         return moves;
+    }
+
+    public void setPlayerTurn(GamePlayer player) {
+        this.playerTurn = player;
+    }
+
+    public GamePlayer getPlayerTurn() {
+        return playerTurn;
+    }
+
+    public boolean getGameStatus() {
+        return gameOver;
+    }
+
+    public int evaluateUtility(Move move) {
+        // greater than zero: better for player
+        // equals zero: neither better nor worse
+        // less than zero move: better for opponent
+        int playerUtility = 0;
+        int opponentUtility = 0;
+        int row = move.getRow();
+        int col = move.getCol();
+        // check player moves
+        // check four in a row horizontally
+        if (row + 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X &&
+                    tiles[row + 2][col] == GamePiece.X && tiles[row + 3][col] == GamePiece.X) {
+                playerUtility += 10000;
+            }
+        }
+        if (row - 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row - 1][col] == GamePiece.X &&
+                    tiles[row - 2][col] == GamePiece.X && tiles[row - 3][col] == GamePiece.X) {
+                playerUtility += 10000;
+            }
+        }
+        // check three in a row horizontally
+        if (row + 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X &&
+                    tiles[row + 2][col] == GamePiece.X) {
+                playerUtility += 75;
+            }
+        }
+        if (row - 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row - 1][col] == GamePiece.X &&
+                    tiles[row - 2][col] == GamePiece.X) {
+                playerUtility += 75;
+            }
+        }
+        // check two in a row horizontally
+        if (row + 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X) {
+                playerUtility += 25;
+            }
+        }
+        if (row - 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.X && tiles[row + 1][col] == GamePiece.X) {
+                playerUtility += 25;
+            }
+        }
+
+        // check opponent moves
+        if (row + 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O &&
+                    tiles[row + 2][col] == GamePiece.O && tiles[row + 3][col] == GamePiece.O) {
+                opponentUtility -= 10000;
+            }
+        }
+        if (row - 3 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row - 1][col] == GamePiece.O &&
+                    tiles[row - 2][col] == GamePiece.O && tiles[row - 3][col] == GamePiece.O) {
+                opponentUtility -= 10000;
+            }
+        }
+        // check three in a row horizontally
+        if (row + 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O &&
+                    tiles[row + 2][col] == GamePiece.O) {
+                opponentUtility -= 75;
+            }
+        }
+        if (row - 2 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row - 1][col] == GamePiece.O &&
+                    tiles[row - 2][col] == GamePiece.O) {
+                opponentUtility -= 75;
+            }
+        }
+        // check two in a row horizontally
+        if (row + 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O) {
+                opponentUtility -= 25;
+            }
+        }
+        if (row - 1 < BOARD_SIZE) {
+            if (tiles[row][col] == GamePiece.O && tiles[row + 1][col] == GamePiece.O) {
+                opponentUtility -= 25;
+            }
+        }
+
+        return playerUtility - opponentUtility;
     }
 
     @Override

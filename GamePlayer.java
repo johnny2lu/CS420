@@ -1,3 +1,14 @@
 public enum GamePlayer {
-    PLAYER, OPPONENT
+    PLAYER, OPPONENT;
+/*
+    private int value;
+
+    GamePlayer(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+*/
 }
